@@ -1,0 +1,21 @@
+# ── API keys ──────────────────────────────────────────
+.env
+
+# ── Python ────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# ── Virtual environments ─────────────────────────────
+venv/
+.venv/
+
+# ── Vector store (large binaries — rebuilt at runtime) ─
+vector_store/*.qdrant
+vector_store/*.json
+vector_store/*.snapshot
+
+# ── OS junk ───────────────────────────────────────────
+.DS_Store
+Thumbs.db
