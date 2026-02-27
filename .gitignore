@@ -12,9 +12,9 @@ venv/
 .venv/
 
 # ── Vector store (large binaries — rebuilt at runtime) ─
-vector_store/*.qdrant
-vector_store/*.json
-vector_store/*.snapshot
+# vector_store/*.qdrant
+# vector_store/*.json
+# vector_store/*.snapshot
 
 # ── OS junk ───────────────────────────────────────────
 .DS_Store
