@@ -3,7 +3,7 @@ import os
 
 # SECTION 1 — Page config (must be first Streamlit call)
 st.set_page_config(
-  page_title="SBI MF Facts Assistant",
+  page_title="SBI MF Facts — for Groww Users",
   page_icon="📊",
   layout="centered",
   initial_sidebar_state="collapsed"
@@ -36,16 +36,21 @@ if "backend_initialized" not in st.session_state:
     with st.spinner("Setting up retrieval engine..."):
         initialize_backend()
     st.session_state.backend_initialized = True
-    st.success("Ready")
+    st.sidebar.success("✓ Knowledge base loaded")
 
 # SECTION 3 — Header
 st.title("SBI MF Facts Assistant")
-st.subheader("Factual answers on SBI Large Cap, Flexi Cap and ELSS Tax Saver schemes.")
-st.info("Facts only. No investment advice. Sources: SBIMF / AMFI / SEBI. Do not share PAN, Aadhaar or account numbers.", icon="ℹ️")
+st.markdown("<p style='font-size: 0.8em; color: gray; margin-top: -15px; margin-bottom: 15px;'>Built for Groww users · Powered by official AMC & SEBI data</p>", unsafe_allow_html=True)
+st.subheader("Get instant factual answers on SBI MF schemes available on Groww — expense ratios, exit loads, SIP minimums, ELSS lock-in and more.")
+st.info("ℹ️  Facts only · No investment advice · For Groww users researching SBI MF schemes · Sources: SBIMF / AMFI / SEBI · Do not share PAN, Aadhaar or account numbers.")
 
 # SECTION 5 — Chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
+
+# Welcome message if no chat history
+if len(st.session_state.messages) == 0:
+    st.info("👋 Welcome, Groww user. Ask me any factual question about SBI Large Cap, SBI Flexi Cap, or SBI ELSS Tax Saver Fund. I will answer with verified facts and a source link. I cannot give investment advice or recommendations.")
 
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
@@ -58,14 +63,14 @@ for msg in st.session_state.messages:
 # SECTION 4 — Example question chips
 cols = st.columns(3)
 with cols[0]:
-    if st.button("Expense ratio of SBI Large Cap?"):
-        st.session_state.preset_query = "Expense ratio of SBI Large Cap?"
+    if st.button("SBI Large Cap expense ratio?"):
+        st.session_state.preset_query = "SBI Large Cap expense ratio?"
 with cols[1]:
-    if st.button("ELSS lock-in period?"):
-        st.session_state.preset_query = "ELSS lock-in period?"
+    if st.button("ELSS lock-in and 80C benefit?"):
+        st.session_state.preset_query = "ELSS lock-in and 80C benefit?"
 with cols[2]:
-    if st.button("How to download capital gains statement?"):
-        st.session_state.preset_query = "How to download capital gains statement?"
+    if st.button("Download capital gains from CAMS?"):
+        st.session_state.preset_query = "Download capital gains from CAMS?"
 
 # Use the preset query if a button was clicked
 user_input = st.chat_input("Ask a factual question about SBI MF schemes")
@@ -138,4 +143,4 @@ if user_input:
 
 # SECTION 7 — Footer
 st.markdown("---")
-st.caption("Facts only. No investment advice. Data sourced from official public documents: sbimf.com, amfiindia.com, sebi.gov.in. Mutual fund investments are subject to market risks. Read all scheme documents carefully.")
+st.caption("For Groww users only · Facts sourced from sbimf.com, amfiindia.com, sebi.gov.in · This tool is not affiliated with or endorsed by Groww · Mutual fund investments are subject to market risks · Read all scheme documents carefully before investing.")
