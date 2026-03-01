@@ -9,6 +9,21 @@ st.set_page_config(
   initial_sidebar_state="collapsed"
 )
 
+st.markdown(
+    "<style>"
+    "div.stButton > button {"
+    "  border: 1px solid #00d09c;"
+    "  color: #00d09c;"
+    "}"
+    "div.stButton > button:hover {"
+    "  background-color: #00d09c;"
+    "  color: white;"
+    "}"
+    "a { color: #00d09c !important; }"
+    "</style>",
+    unsafe_allow_html=True
+)
+
 # SECTION 3 — SECRETS HANDLING FOR STREAMLIT CLOUD
 # Works both locally (.env) and on Streamlit Cloud (secrets)
 OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY") or \
@@ -41,7 +56,13 @@ if "backend_initialized" not in st.session_state:
 # SECTION 3 — Header
 st.title("SBI MF Facts Assistant")
 st.markdown("<p style='font-size: 0.8em; color: gray; margin-top: -15px; margin-bottom: 15px;'>Built for Groww users · Powered by official AMC & SEBI data</p>", unsafe_allow_html=True)
-st.subheader("Get instant factual answers on SBI MF schemes available on Groww — expense ratios, exit loads, SIP minimums, ELSS lock-in and more.")
+st.markdown(
+    "<p style='font-size:16px; color:#444; margin-top:-10px;'>"
+    "Get instant factual answers on SBI MF schemes on Groww "
+    "— expense ratios, exit loads, SIP minimums, ELSS lock-in."
+    "</p>",
+    unsafe_allow_html=True
+)
 st.info("ℹ️  Facts only · No investment advice · For Groww users researching SBI MF schemes · Sources: SBIMF / AMFI / SEBI · Do not share PAN, Aadhaar or account numbers.")
 
 # SECTION 5 — Chat history
@@ -50,7 +71,17 @@ if "messages" not in st.session_state:
 
 # Welcome message if no chat history
 if len(st.session_state.messages) == 0:
-    st.info("👋 Welcome, Groww user. Ask me any factual question about SBI Large Cap, SBI Flexi Cap, or SBI ELSS Tax Saver Fund. I will answer with verified facts and a source link. I cannot give investment advice or recommendations.")
+    st.markdown(
+        "<div style='background:#fffbea; border-left:4px solid "
+        "#f5a623; padding:12px 16px; border-radius:6px; "
+        "font-size:14px; color:#555;'>"
+        "👋 Welcome, Groww user. Ask me any factual question "
+        "about SBI Large Cap, SBI Flexi Cap, or SBI ELSS Tax "
+        "Saver Fund. Answers come with a verified source link. "
+        "No investment advice or recommendations."
+        "</div>",
+        unsafe_allow_html=True
+    )
 
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
@@ -73,7 +104,7 @@ with cols[2]:
         st.session_state.preset_query = "Download capital gains from CAMS?"
 
 # Use the preset query if a button was clicked
-user_input = st.chat_input("Ask a factual question about SBI MF schemes")
+user_input = st.chat_input("Ask about SBI MF schemes on Groww...")
 preset_query = st.session_state.pop("preset_query", None)
 if preset_query:
     user_input = preset_query
@@ -143,4 +174,17 @@ if user_input:
 
 # SECTION 7 — Footer
 st.markdown("---")
-st.caption("For Groww users only · Facts sourced from sbimf.com, amfiindia.com, sebi.gov.in · This tool is not affiliated with or endorsed by Groww · Mutual fund investments are subject to market risks · Read all scheme documents carefully before investing.")
+st.markdown(
+    "<div style='font-size:11px; color:#888; "
+    "padding:16px 0; line-height:1.6;'>"
+    "For Groww users only &nbsp;·&nbsp; "
+    "Facts sourced from sbimf.com, amfiindia.com, "
+    "sebi.gov.in &nbsp;·&nbsp; "
+    "This tool is not affiliated with or endorsed by Groww "
+    "&nbsp;·&nbsp; "
+    "Mutual fund investments are subject to market risks "
+    "&nbsp;·&nbsp; "
+    "Read all scheme documents carefully before investing."
+    "</div>",
+    unsafe_allow_html=True
+)
