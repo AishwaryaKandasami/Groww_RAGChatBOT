@@ -11,23 +11,6 @@ st.set_page_config(
 
 st.markdown(
     "<style>"
-    "div.stButton > button {"
-    "  border: 1px solid #00d09c;"
-    "  color: #00d09c;"
-    "  background-color: white;"
-    "}"
-    "div.stButton > button:hover {"
-    "  background-color: #e6faf5;"
-    "  color: #00d09c;"
-    "}"
-    "div.stButton > button:focus {"
-    "  box-shadow: none !important;"
-    "}"
-    "div.stButton > button.active {"
-    "  background-color: #00d09c !important;"
-    "  color: white !important;"
-    "  border: none !important;"
-    "}"
     "a { color: #00d09c !important; }"
     "</style>",
     unsafe_allow_html=True
@@ -74,45 +57,24 @@ st.markdown(
 )
 st.info("ℹ️  Facts only · No investment advice · For Groww users researching SBI MF schemes · Sources: SBIMF / AMFI / SEBI · Do not share PAN, Aadhaar or account numbers.")
 
+# Scheme Selector
+col1, col2, col3 = st.columns([2, 1, 1])
+with col1:
+    st.selectbox(
+        label="Asking about:",
+        options=[
+            "All Schemes",
+            "SBI Large Cap Fund",
+            "SBI Flexi Cap Fund",
+            "SBI ELSS Tax Saver Fund"
+        ],
+        key="selected_scheme",
+        help="Filter answers to a specific scheme. If your question mentions a different scheme the filter will be ignored."
+    )
+
 # SECTION 5 — Chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
-
-# SECTION 5a — Scheme Selector
-if "selected_scheme" not in st.session_state:
-    st.session_state.selected_scheme = "All Schemes"
-
-st.markdown("<p style='font-size: 12px; color: gray; margin-bottom: 5px;'>Asking about:</p>", unsafe_allow_html=True)
-
-# Layout for the 4 buttons
-cols = st.columns(4)
-schemes = ["All Schemes", "SBI Large Cap", "SBI Flexi Cap", "SBI ELSS"]
-
-for i, scheme in enumerate(schemes):
-    with cols[i]:
-        # Determine if this button is the active one
-        is_active = st.session_state.selected_scheme == scheme
-        
-        # Streamlit doesn't support dynamic classes on buttons natively.
-        # However, we can use a trick with markdown + HTML for identical styling, 
-        # or use standard st.button and rely on rerun to re-render.
-        # Since the user requested CSS overriding, we will inject a dynamic style block 
-        # specifically for the nth-child button if it's active.
-        
-        if is_active:
-            st.markdown(
-                f"<style>div[data-testid='column']:nth-of-type({i+1}) div.stButton > button {{ background-color: #00d09c !important; color: white !important; border: none !important; }}</style>",
-                unsafe_allow_html=True
-            )
-            
-        if st.button(scheme, key=f"btn_{scheme}", use_container_width=True):
-            st.session_state.selected_scheme = scheme
-            st.rerun()
-
-if st.session_state.selected_scheme != "All Schemes":
-    st.markdown(f"<p style='font-size: 12px; color: gray;'>Showing results for {st.session_state.selected_scheme} only. Select All Schemes to search across all funds.</p>", unsafe_allow_html=True)
-else:
-    st.markdown("<p style='margin-bottom: 20px;'></p>", unsafe_allow_html=True)
 
 # Welcome message if no chat history
 if len(st.session_state.messages) == 0:
@@ -154,6 +116,28 @@ preset_query = st.session_state.pop("preset_query", None)
 if preset_query:
     user_input = preset_query
 
+def detect_query_scheme(query: str):
+    # Returns scheme name if detected in query text
+    # Returns None if no scheme detected
+    query_lower = query.lower()
+    
+    if any(term in query_lower for term in [
+        "large cap", "largecap", "bluechip", "blue chip"
+    ]):
+        return "SBI Large Cap Fund"
+    
+    if any(term in query_lower for term in [
+        "flexi cap", "flexicap", "flexi-cap"
+    ]):
+        return "SBI Flexi Cap Fund"
+    
+    if any(term in query_lower for term in [
+        "elss", "tax saver", "long term equity", "80c"
+    ]):
+        return "SBI ELSS Tax Saver Fund"
+    
+    return None
+
 # SECTION 6 — Chat input and pipeline
 if user_input:
     # 1. Display user message immediately
@@ -161,8 +145,43 @@ if user_input:
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    # 2. Show st.spinner("Retrieving answer...")
+    selected = st.session_state.selected_scheme
+    detected = detect_query_scheme(user_input)
+
+    # Case 1 — No conflict: All Schemes selected
+    if selected == "All Schemes":
+        scheme_filter = None
+        conflict = False
+
+    # Case 2 — No conflict: selection matches query
+    elif detected is None or detected == selected:
+        scheme_filter = selected
+        conflict = False
+
+    # Case 3 — CONFLICT: query mentions different scheme
+    else:
+        scheme_filter = None
+        conflict = True
+        conflict_message = (
+            f"Your question mentions {detected} but "
+            f"your filter is set to {selected}. "
+            f"Searching across all schemes to give "
+            f"you the most relevant answer."
+        )
+
+    SCHEME_FILTER_MAP = {
+        "All Schemes": None,
+        "SBI Large Cap Fund": "SBI Large Cap",
+        "SBI Flexi Cap Fund": "SBI Flexi Cap",
+        "SBI ELSS Tax Saver Fund": "SBI ELSS"
+    }
+    scheme_filter = SCHEME_FILTER_MAP[selected] if not conflict else None
+
+    # 2. Show spinner for retrieval
     with st.chat_message("assistant"):
+        if conflict:
+            st.warning(conflict_message)
+
         with st.spinner("Retrieving answer..."):
             try:
                 # 3. Call classify_query
@@ -170,14 +189,11 @@ if user_input:
                 action = classification.get("action")
 
                 if action == "retrieve":
-                    if st.session_state.selected_scheme == "All Schemes":
-                        chunks = retrieve(user_input, api_key=OPENAI_API_KEY, scheme_filter=None)
-                    else:
-                        chunks = retrieve(
-                            user_input,
-                            api_key=OPENAI_API_KEY,
-                            scheme_filter=st.session_state.selected_scheme
-                        )
+                    chunks = retrieve(
+                        user_input,
+                        scheme_filter=scheme_filter,
+                        api_key=OPENAI_API_KEY
+                    )
                     result = generate(user_input, chunks, api_key=GROQ_API_KEY)
                     
                     answer = result["answer"]
@@ -220,7 +236,7 @@ if user_input:
                     st.session_state.messages.append({"role": "assistant", "content": answer})
                     
             except Exception as e:
-                # TASK 4 — ERROR HANDLING
+                # ERROR HANDLING
                 print(f"Pipeline error: {e}")
                 st.error("Unable to retrieve answer. Please try again or visit sbimf.com directly.")
 
