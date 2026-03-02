@@ -33,19 +33,19 @@ PDFS = [
     },
     {
         "id": 7,
-        "url": "https://www.sbimf.com/docs/default-source/scheme-factsheets/sbi-largecap-fund-factsheet-january-2026.pdf",
+        "url": "https://www.sbimf.com/docs/default-source/scheme-factsheets/sbi-largecap-fund-factsheet-february-2026.pdf",
         "doc_type": "factsheet_pdf",
         "scheme": "SBI Large Cap"
     },
     {
         "id": 8,
-        "url": "https://www.sbimf.com/docs/default-source/scheme-factsheets/sbi-flexicap-fund-factsheet-january-2026.pdf?sfvrsn=1e77f738_2",
+        "url": "https://www.sbimf.com/docs/default-source/scheme-factsheets/sbi-flexicap-fund-factsheet-february-2026.pdf?sfvrsn=1e77f738_2",
         "doc_type": "factsheet_pdf",
         "scheme": "SBI Flexi Cap"
     },
     {
         "id": 9,
-        "url": "https://www.sbimf.com/docs/default-source/scheme-factsheets/sbi-elss-tax-saver-fund-factsheet-january-2026.pdf?sfvrsn=97ae2ce2_2",
+        "url": "https://www.sbimf.com/docs/default-source/scheme-factsheets/sbi-elss-tax-saver-fund-factsheet-february-2026.pdf?sfvrsn=97ae2ce2_2",
         "doc_type": "factsheet_pdf",
         "scheme": "SBI ELSS"
     },

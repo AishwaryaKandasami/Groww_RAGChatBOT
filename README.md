@@ -95,7 +95,15 @@ streamlit run app.py
 
 > **Note:** The vector store is rebuilt in-memory on each cold start from `extracted_facts.json`. This adds ~10–15 seconds to startup but avoids committing large binary files.
 
+## Automated Updates
+
+This repository includes a GitHub Actions workflow (`.github/workflows/monthly_kb_update.yml`) that runs automatically on the 1st of every month to keep the scheme information current without manual intervention:
+1. Runs `extract_pdf_text.py` to download the latest KIM, SID, and factsheets for the 3 allowed mutual funds.
+2. Extracts updated text content into `pdf_extracts/`.
+3. Commits and pushes any changes to the repository automatically.
+
 ## Environment Variables
+
 
 | Variable | Used by | Purpose |
 |----------|---------|---------|
