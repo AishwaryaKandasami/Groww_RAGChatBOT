@@ -129,6 +129,7 @@ _OPINION_PHRASES = [
     "guaranteed returns", "assured returns",
     "how much will i earn", "how much return",
     "can i get", "will i get",
+    "can i invest",
     # Patch 5 — boundary-straddling phrases
     "is that high", "is that low", "is it cheap",
     "is this better than", "should i be worried",
