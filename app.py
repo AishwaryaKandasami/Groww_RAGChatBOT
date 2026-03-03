@@ -231,25 +231,17 @@ with left_col:
             unsafe_allow_html=True
         )
 
-    # Display chat history
-    for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]):
-            if msg.get("is_html"):
-                st.markdown(msg["content"], unsafe_allow_html=True)
-            else:
-                st.markdown(msg["content"])
-
-    # Example question chips
-    cols = st.columns(3)
-    with cols[0]:
-        if st.button("SBI Large Cap expense ratio?"):
-            st.session_state.preset_query = "SBI Large Cap expense ratio?"
-    with cols[1]:
-        if st.button("ELSS lock-in and 80C benefit?"):
-            st.session_state.preset_query = "ELSS lock-in and 80C benefit?"
-    with cols[2]:
-        if st.button("Download capital gains from CAMS?"):
-            st.session_state.preset_query = "Download capital gains from CAMS?"
+        # Example question chips
+        cols = st.columns(3)
+        with cols[0]:
+            if st.button("SBI Large Cap expense ratio?"):
+                st.session_state.preset_query = "SBI Large Cap expense ratio?"
+        with cols[1]:
+            if st.button("ELSS lock-in and 80C benefit?"):
+                st.session_state.preset_query = "ELSS lock-in and 80C benefit?"
+        with cols[2]:
+            if st.button("Download capital gains from CAMS?"):
+                st.session_state.preset_query = "Download capital gains from CAMS?"
 
 with right_col:
     # SCHEME SELECTOR CARD
@@ -337,6 +329,8 @@ with right_col:
 
 
 with left_col:
+    chat_container = st.container()
+
     # Use the preset query if a button was clicked
     user_input = st.chat_input("Ask about SBI MF schemes on Groww...")
     preset_query = st.session_state.pop("preset_query", None)
@@ -360,10 +354,18 @@ with left_col:
         return None
 
     # SECTION 6 - Chat input and pipeline
+    with chat_container:
+        for msg in st.session_state.messages:
+            with st.chat_message(msg["role"]):
+                if msg.get("is_html"):
+                    st.markdown(msg["content"], unsafe_allow_html=True)
+                else:
+                    st.markdown(msg["content"])
+
     if user_input:
         # 1. Display user message immediately
         st.session_state.messages.append({"role": "user", "content": user_input})
-        with st.chat_message("user"):
+        with chat_container.chat_message("user"):
             st.markdown(user_input)
 
         selected = st.session_state.selected_scheme
@@ -400,9 +402,9 @@ with left_col:
 
         # 2. Show spinner for retrieval
         if conflict:
-            st.warning(conflict_message)
+            chat_container.warning(conflict_message)
 
-        with st.chat_message("assistant"):
+        with chat_container.chat_message("assistant"):
             with st.spinner("Retrieving answer..."):
                 try:
                     # 3. Call classify_query
